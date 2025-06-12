@@ -14,53 +14,57 @@ public class LeerDatos extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        List<DatoClimatico> datos = new ArrayList<>();
+    	List<DatoClimatico> datos = new ArrayList<>();
+    	String sql = "SELECT id, fecha, temperatura_general, temperatura_peligrosa, " +
+    	             "humedad_tierra, gases, humedad_aire " +
+    	             "FROM datos " +
+    	             "ORDER BY fecha DESC " +
+    	             "LIMIT 10";
 
-        try (Connection conexion = ConexionBD.obtenerConexion();
-        	     Statement statement = conexion.createStatement();
-        	     ResultSet rs = statement.executeQuery(
-        	             "SELECT Fecha, Temperatura_general, Temperatura_peligrosa, Humedad_tierra, aire, gases FROM datos")) {
+    	try (Connection conexion = ConexionBD.obtenerConexion();
+    	     Statement statement = conexion.createStatement();
+    	     ResultSet rs = statement.executeQuery(sql)) {
 
-        	     System.out.println("Conexión exitosa a la base de datos.");
+    	    System.out.println("Conexión exitosa a la base de datos.");
 
-            boolean tieneDatos = false;  // Para verificar si se están recuperando datos
+    	    boolean tieneDatos = false;
 
-            // Iteramos sobre los resultados
-            while (rs.next()) {
-                tieneDatos = true;
+    	    while (rs.next()) {
+    	        tieneDatos = true;
 
-                Date fecha = rs.getDate("Fecha");
-                double temperaturaGeneral = rs.getDouble("Temperatura_general");
-                double temperaturaPeligrosa = rs.getDouble("Temperatura_peligrosa");
-                double humedadTierra = rs.getDouble("Humedad_tierra");
-                double aire = rs.getDouble("aire");
-                double gases = rs.getDouble("gases");
+    	        Timestamp timestamp = rs.getTimestamp("fecha");
+    	        Date fecha = new Date(timestamp.getTime());
 
-                // Verificar si los datos se están extrayendo correctamente
-                System.out.println("Fecha: " + fecha + ", Temperatura general: " + temperaturaGeneral +
-                                   ", Temperatura peligrosa: " + temperaturaPeligrosa +
-                                   ", Humedad tierra: " + humedadTierra +
-                                   ", Aire: " + aire + ", Gases: " + gases);
+    	        double temperaturaGeneral = rs.getDouble("temperatura_general");
+    	        double temperaturaPeligrosa = rs.getDouble("temperatura_peligrosa");
+    	        double humedadTierra = rs.getDouble("humedad_tierra");
+    	        double gases = rs.getDouble("gases");
+    	        double humedadAire = rs.getDouble("humedad_aire");
 
-                DatoClimatico dato = new DatoClimatico(fecha, temperaturaGeneral, temperaturaPeligrosa,
-                        humedadTierra, aire, gases);
-                datos.add(dato);
-            }
+    	        System.out.println("Fecha: " + fecha + ", Temp general: " + temperaturaGeneral +
+    	                ", Peligrosa: " + temperaturaPeligrosa + ", Tierra: " + humedadTierra +
+    	                ", Humedad Aire: " + humedadAire + ", Gases: " + gases);
 
-            if (!tieneDatos) {
-                System.out.println("No se encontraron datos en la base de datos.");
-            }
-            
-            // Agregar los datos al request
-            request.setAttribute("datos", datos);
-            
-            // Despachar al JSP
-            request.getRequestDispatcher("vistas/PaginaClima.jsp").forward(request, response);
+    	        DatoClimatico dato = new DatoClimatico(
+    	            fecha, temperaturaGeneral, temperaturaPeligrosa,
+    	            humedadTierra, humedadAire, gases
+    	        );
 
-        } catch (SQLException e) {
-            e.printStackTrace();  // Esto mostrará el error completo en la consola
-            request.setAttribute("errorMessage", "Error de base de datos: " + e.getMessage());
-            request.getRequestDispatcher("vistas/ErrorPage.jsp").forward(request, response);
-        }
+    	        datos.add(dato);
+    	    }
+
+    	    if (!tieneDatos) {
+    	        System.out.println("No se encontraron datos en la base de datos.");
+    	    }
+
+    	    request.setAttribute("datos", datos);
+    	    request.getRequestDispatcher("vistas/PaginaClima.jsp").forward(request, response);
+
+    	} catch (SQLException e) {
+    	    e.printStackTrace();
+    	    request.setAttribute("errorMessage", "Error de base de datos: " + e.getMessage());
+    	    request.getRequestDispatcher("vistas/ErrorPage.jsp").forward(request, response);
+    	}
+
     }
 }

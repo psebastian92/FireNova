@@ -7,8 +7,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mapa Visual Térmico Dinámico - Argentina</title>
-<link rel="stylesheet" href="styles/main.css">
-<link rel="stylesheet" href="styles/map.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/styles/main.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/styles/map.css">
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
@@ -75,7 +75,6 @@
 				</div>
 				<div id="map-wrapper">
 					<div id="map"></div>
-					<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 					<script>
     const map = L.map('map', {
       center: [-38.4161, -63.6167], // Centro de Argentina
@@ -98,15 +97,15 @@ const datosClimaticos = [
 		double tempGen = d.getTemperaturaGeneral();
 		double tempPelig = d.getTemperaturaPeligrosa();
 		double humedad = d.getHumedadTierra();
-		String aireStr = String.valueOf(d.getAire());
-		String gasesStr = String.valueOf(d.getGases());%>
+		double aireStr = d.gethumedadAire();
+		double gasesStr = d.getGases();%>
   {
     fecha: "<%=fechaStr%>",
     temperaturaGeneral: <%=tempGen%>,
     temperaturaPeligrosa: <%=tempPelig%>,
     humedadTierra: <%=humedad%>,
-    aire: "<%=aireStr%>",
-    gases: "<%=gasesStr%>"
+    aire: <%=aireStr%>,
+    gases: <%=gasesStr%>
   }<%=(i < datos.size() - 1) ? "," : ""%>
   <%}
 }%>
@@ -122,13 +121,14 @@ const coordenadasCordoba = [
 
 // Paso 3: Función para asignar color según temperatura peligrosa
 function getColor(valor) {
-  if (valor < 10) return "#00ffff";  // celeste
-  if (valor < 20) return "#00cc44";  // verde
-  if (valor < 30) return "#ffff00";  // amarillo
-  if (valor < 40) return "#ff8000";  // naranja
-  return "#ff0000";                  // rojo
+  const num = Number(valor);
+  if (isNaN(num)) return null; // o algún color por defecto si no es número
+  if (num < 10) return "#00ffff";  // celeste
+  if (num < 20) return "#00cc44";  // verde
+  if (num < 30) return "#ffff00";  // amarillo
+  if (num < 40) return "#ff8000";  // naranja
+  return "#ff0000";  // rojo si es >= 40
 }
-
 // Paso 4: Crear círculos con popups que muestran todos los valores
 const circulos = {};
 // Usamos los últimos 3 datos para los 3 sensores
@@ -136,24 +136,21 @@ const datosMostrar = datosClimaticos.slice(-3);
 
 datosMostrar.forEach((dato, i) => {
   const coord = coordenadasCordoba[i];
-  const color = getColor(dato.temperaturaPeligrosa);
+  const color = getColor(dato.temperaturaGeneral);
 
-  console.log(`Sensor ${i}:`, {
-    coordenadas: coord,
-    dato: dato
-  });
   
-  const popupContent = `
-    <strong>${coord.nombre}</strong><br>
-    Fecha: ${dato.fecha}<br>
-    Temp. General: ${dato.temperaturaGeneral}°C<br>
-    Temp. Peligrosa: ${dato.temperaturaPeligrosa}°C<br>
-    Humedad Tierra: ${dato.humedadTierra}%<br>
-    Aire: ${dato.aire}<br>
-    Gases: ${dato.gases}
-  `;
+	const popupContent =
+		  "<strong>" + coord.nombre + "</strong><br>" +
+		  "Fecha: " + dato.fecha + "<br>" +
+		  "Temp. General: " + dato.temperaturaGeneral + "°C<br>" +
+		  "Temp. Peligrosa: " + dato.temperaturaPeligrosa + "°C<br>" +
+		  "Humedad Tierra: " + dato.humedadTierra + "%<br>" +
+		  "Aire: " + dato.aire + "<br>" +
+		  "Gases: " + dato.gases;
+	;
 
   const circulo = L.circle([coord.lat, coord.lng], {
+	 
     color: color,
     fillColor: color,
     fillOpacity: 0.6,
@@ -161,7 +158,9 @@ datosMostrar.forEach((dato, i) => {
   }).addTo(map).bindPopup(popupContent);
 
   circulos[i] = circulo;
+
 });
+
 </script>
 
 				</div>
@@ -202,42 +201,54 @@ datosMostrar.forEach((dato, i) => {
 						</tr>
 						<tr>
 							<th>Aire</th>
-							<td><%=ultimoDato.getAire()%></td>
+							<td><%=ultimoDato.gethumedadAire()%></td>
 						</tr>
 						<tr>
 							<th>Gases</th>
 							<td><%=ultimoDato.getGases()%></td>
 						</tr>
+
 					</table>
 					<%
 					}
 					%>
 				</div>
 
-				<!-- Alerta -->
-				<div class="panel alert-panel" id="alert-panel">
-					<h2>Mensaje de alerta</h2>
-					<div class="alert-message" id="alert-message">
-						<%
-						if (ultimoDato != null && ultimoDato.getTemperaturaPeligrosa() > 40) {
-						%>
-						<span style="color: red; font-weight: bold;">¡Alerta!
-							Valores fuera del rango aceptable.</span>
-						<%
-						} else if (ultimoDato != null) {
-						%>
-						No hay alertas activas en este momento.
-						<%
-						} else {
-						%>
-						Sin información.
-						<%
-						}
-						%>
-					</div>
-				</div>
-			</div>
+<div class="panel alert-panel" id="alert-panel">
+	<h2>Mensajes de alerta</h2>
+	<div class="alert-message" id="alert-message">
+	<%
+		if (datos != null && !datos.isEmpty()) {
+			boolean hayAlertas = false;
+			String[] nombresSensores = { "Sensor Norte", "Sensor Centro", "Sensor Este", "Sensor Sur", "Sensor Extra" };
+
+			for (int i = 0; i < datos.size(); i++) {
+				DatoClimatico dato = datos.get(i);
+				if (dato.getTemperaturaPeligrosa() > 40) {
+					hayAlertas = true;
+					String nombreSensor = (i < nombresSensores.length) ? nombresSensores[i] : "Sensor " + (i + 1);
+	%>
+					<p>⚠ Alerta en <%= nombreSensor %>: Temperatura peligrosa de <%= dato.getTemperaturaPeligrosa() %>°C</p>
+	<%
+				}
+			}
+
+			if (!hayAlertas) {
+	%>
+				<p>No hay alertas activas en este momento.</p>
+	<%
+			}
+		} else {
+	%>
+			<p>Sin información disponible.</p>
+	<%
+		}
+	%>
+	</div>
+</div>
+	</div>
 		</main>
+		
 	</div>
 
 	<script src="scripts/data.js"></script>
