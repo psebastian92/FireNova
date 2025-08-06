@@ -16,7 +16,7 @@ public class LeerDatos extends HttpServlet {
 
     	List<DatoClimatico> datos = new ArrayList<>();
     	String sql = "SELECT id, fecha, temperatura_general, temperatura_peligrosa, " +
-    	             "humedad_tierra, gases, humedad_aire " +
+    	             "humedad_tierra, gases, humedad_aire, Viento " +
     	             "FROM datos " +
     	             "ORDER BY fecha DESC " +
     	             "LIMIT 10";
@@ -36,18 +36,19 @@ public class LeerDatos extends HttpServlet {
     	        Date fecha = new Date(timestamp.getTime());
 
     	        double temperaturaGeneral = rs.getDouble("temperatura_general");
-    	        double temperaturaPeligrosa = rs.getDouble("temperatura_peligrosa");
+    	        double TemperaturaPeligrosa = rs.getDouble("temperatura_peligrosa");
     	        double humedadTierra = rs.getDouble("humedad_tierra");
     	        double gases = rs.getDouble("gases");
     	        double humedadAire = rs.getDouble("humedad_aire");
+    	        double viento = rs.getDouble("Viento");
 
     	        System.out.println("Fecha: " + fecha + ", Temp general: " + temperaturaGeneral +
-    	                ", Peligrosa: " + temperaturaPeligrosa + ", Tierra: " + humedadTierra +
-    	                ", Humedad Aire: " + humedadAire + ", Gases: " + gases);
+    	                ", Peligrosa: " + TemperaturaPeligrosa + ", Tierra: " + humedadTierra +
+    	                ", Humedad Aire: " + humedadAire + ", Gases: " + gases + " , viento: " + viento);
 
     	        DatoClimatico dato = new DatoClimatico(
-    	            fecha, temperaturaGeneral, temperaturaPeligrosa,
-    	            humedadTierra, humedadAire, gases
+    	            fecha, temperaturaGeneral, TemperaturaPeligrosa,
+    	            humedadTierra, humedadAire, gases, viento
     	        );
 
     	        datos.add(dato);

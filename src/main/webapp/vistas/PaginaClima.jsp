@@ -9,20 +9,32 @@
 <title>Mapa Visual Térmico Dinámico - Argentina</title>
 <link rel="stylesheet" href="${pageContext.request.contextPath}/styles/main.css">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/styles/map.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/styles/main1.css">
+
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
 </head>
 <body>
 	<div class="container">
-		<header class="header">
+			<header class="header">
 			<div class="logo-container">
 				<div class="logo">
-					<img src="assets/compass-icon.svg" alt="Logo">
+					<img src="${pageContext.request.contextPath}/multimedia/logo.png" alt="Logo">
 				</div>
 				<span class="website">www.fatima.com</span>
 			</div>
+			<!-- Menú de navegación -->
+			<nav class="main-nav">
+			  <ul>
+			    <li><a href="${pageContext.request.contextPath}/vistas/inicio.jsp">Inicio</a></li>
+			    <li><a href="${pageContext.request.contextPath}/vistas/PaginaClima.jsp">Mapa</a></li>
+			    <li><a href="${pageContext.request.contextPath}/vistas/about.jsp">About</a></li>
+			  </ul>
+			</nav>
 			<h1 class="title">Mapa visual térmico dinámico</h1>
+
+			
 		</header>
 
 		<main class="main-content">
@@ -98,14 +110,16 @@ const datosClimaticos = [
 		double tempPelig = d.getTemperaturaPeligrosa();
 		double humedad = d.getHumedadTierra();
 		double aireStr = d.gethumedadAire();
-		double gasesStr = d.getGases();%>
+		double gasesStr = d.getGases();
+		double vientoStr = d.getViento();%>
   {
     fecha: "<%=fechaStr%>",
     temperaturaGeneral: <%=tempGen%>,
     temperaturaPeligrosa: <%=tempPelig%>,
     humedadTierra: <%=humedad%>,
     aire: <%=aireStr%>,
-    gases: <%=gasesStr%>
+    gases: <%=gasesStr%>,
+    viento: <%=vientoStr%>
   }<%=(i < datos.size() - 1) ? "," : ""%>
   <%}
 }%>
@@ -147,6 +161,7 @@ datosMostrar.forEach((dato, i) => {
 		  "Humedad Tierra: " + dato.humedadTierra + "%<br>" +
 		  "Aire: " + dato.aire + "<br>" +
 		  "Gases: " + dato.gases;
+		  "viento: " + dato.viento;
 	;
 
   const circulo = L.circle([coord.lat, coord.lng], {
@@ -207,7 +222,11 @@ datosMostrar.forEach((dato, i) => {
 							<th>Gases</th>
 							<td><%=ultimoDato.getGases()%></td>
 						</tr>
-
+						<tr>
+							<th>viento</th>
+							<td><%=ultimoDato.getViento()%></td>
+						</tr>
+						
 					</table>
 					<%
 					}
@@ -215,37 +234,44 @@ datosMostrar.forEach((dato, i) => {
 				</div>
 
 <div class="panel alert-panel" id="alert-panel">
-	<h2>Mensajes de alerta</h2>
-	<div class="alert-message" id="alert-message">
-	<%
-		if (datos != null && !datos.isEmpty()) {
-			boolean hayAlertas = false;
-			String[] nombresSensores = { "Sensor Norte", "Sensor Centro", "Sensor Este", "Sensor Sur", "Sensor Extra" };
+  <h2>Mensajes de alerta</h2>
+  <div class="alert-message" id="alert-message">
+    <%
+      if (datos != null && !datos.isEmpty()) {
+        boolean hayRiesgoIncendio = false;
+        String[] nombresSensores = { "Sensor Norte", "Sensor Centro", "Sensor Este", "Sensor Sur", "Sensor Extra" };
 
-			for (int i = 0; i < datos.size(); i++) {
-				DatoClimatico dato = datos.get(i);
-				if (dato.getTemperaturaPeligrosa() > 40) {
-					hayAlertas = true;
-					String nombreSensor = (i < nombresSensores.length) ? nombresSensores[i] : "Sensor " + (i + 1);
-	%>
-					<p>⚠ Alerta en <%= nombreSensor %>: Temperatura peligrosa de <%= dato.getTemperaturaPeligrosa() %>°C</p>
-	<%
-				}
-			}
+        for (int i = 0; i < datos.size(); i++) {
+          DatoClimatico dato = datos.get(i);
+          boolean condicion = (dato.getTemperaturaPeligrosa() > 30 &&
+                              dato.gethumedadAire() > 30 &&
+                              dato.getViento() > 30);
 
-			if (!hayAlertas) {
-	%>
-				<p>No hay alertas activas en este momento.</p>
-	<%
-			}
-		} else {
-	%>
-			<p>Sin información disponible.</p>
-	<%
-		}
-	%>
-	</div>
+          if (condicion) {
+            hayRiesgoIncendio = true;
+            String nombreSensor = (i < nombresSensores.length) ? nombresSensores[i] : "Sensor " + (i + 1);
+    %>
+            <p>🔥 Riesgo de incendio en <strong><%= nombreSensor %></strong>:<br>
+              Temp: <%= dato.getTemperaturaPeligrosa() %>°C, Aire: <%= dato.gethumedadAire() %>%, Gases: <%= dato.getGases() %>
+            </p>c
+    <%
+          }
+        }
+
+        if (!hayRiesgoIncendio) {
+    %>
+          <p>No hay alertas de incendio en este momento.</p>
+    <%
+        }
+      } else {
+    %>
+        <p>Sin información disponible.</p>
+    <%
+      }
+    %>
+  </div>
 </div>
+
 	</div>
 		</main>
 		

@@ -33,7 +33,7 @@ public class CrearDatos extends HttpServlet {
                     statement.setDouble(2, humedad_tierra);
                     statement.setDouble(3, aire);
                     statement.setDouble(4, gases);
-
+                    
                     int filasAfectadas = statement.executeUpdate();
                     if (filasAfectadas > 0) {
                         System.out.println("Datos insertados correctamente.");

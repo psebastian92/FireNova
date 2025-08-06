@@ -42,6 +42,7 @@ public class RecibirDatos extends HttpServlet {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Faltan parámetros.");
                 return;
             }
+            System.out.println("Recibido - humedadSuelo: " + humedadSuelo);
 
             // Conversión de tipos
             temperatura = Double.parseDouble(tempParam);

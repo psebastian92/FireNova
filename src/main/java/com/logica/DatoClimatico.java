@@ -9,17 +9,20 @@ public class DatoClimatico {
     private double humedadTierra;
     private double humedadAire;
     private double gases;
+    private double viento;
     private double latitud;
     private double longitud;
     
+    
     public DatoClimatico(Date fecha, double temperaturaGeneral, double temperaturaPeligrosa,
-            double humedadTierra, double humedadAire, double gases) {
+            double humedadTierra, double humedadAire, double gases, double viento) {
         this.fecha = fecha;
         this.temperaturaGeneral = temperaturaGeneral;
         this.temperaturaPeligrosa = temperaturaPeligrosa;
         this.humedadTierra = humedadTierra;
         this.humedadAire = humedadAire;
         this.gases = gases;
+        this.viento= viento;
         this.latitud= latitud;
         this.longitud= longitud;
 
@@ -49,6 +52,9 @@ public class DatoClimatico {
     public double getGases() {
         return gases;
     }
+    public double getViento() {
+		return viento;
+	}
 
     public double getLatitud() {
 		return latitud;
