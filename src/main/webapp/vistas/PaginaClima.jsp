@@ -153,16 +153,16 @@ datosMostrar.forEach((dato, i) => {
   const color = getColor(dato.temperaturaGeneral);
 
   
-	const popupContent =
-		  "<strong>" + coord.nombre + "</strong><br>" +
-		  "Fecha: " + dato.fecha + "<br>" +
-		  "Temp. General: " + dato.temperaturaGeneral + "°C<br>" +
-		  "Temp. Peligrosa: " + dato.temperaturaPeligrosa + "°C<br>" +
-		  "Humedad Tierra: " + dato.humedadTierra + "%<br>" +
-		  "Aire: " + dato.aire + "<br>" +
-		  "Gases: " + dato.gases;
-		  "viento: " + dato.viento;
-	;
+  const popupContent =
+	  "<strong>" + coord.nombre + "</strong><br>" +
+	  "Fecha: " + dato.fecha + "<br>" +
+	  "Temp. General: " + dato.temperaturaGeneral + "°C<br>" +
+	  "Temp. Peligrosa: " + dato.temperaturaPeligrosa + "°C<br>" +
+	  "Humedad Tierra: " + dato.humedadTierra + "%<br>" +
+	  "Aire: " + dato.aire + "<br>" +
+	  "Gases: " + dato.gases + "<br>" +
+	  "Viento: " + dato.viento + " km/h";
+	
 
   const circulo = L.circle([coord.lat, coord.lng], {
 	 
@@ -243,7 +243,7 @@ datosMostrar.forEach((dato, i) => {
 
         for (int i = 0; i < datos.size(); i++) {
           DatoClimatico dato = datos.get(i);
-          boolean condicion = (dato.getTemperaturaPeligrosa() > 30 &&
+          boolean condicion = (dato.getTemperaturaGeneral() > 30 &&
                               dato.gethumedadAire() > 30 &&
                               dato.getViento() > 30);
 
@@ -252,8 +252,8 @@ datosMostrar.forEach((dato, i) => {
             String nombreSensor = (i < nombresSensores.length) ? nombresSensores[i] : "Sensor " + (i + 1);
     %>
             <p>🔥 Riesgo de incendio en <strong><%= nombreSensor %></strong>:<br>
-              Temp: <%= dato.getTemperaturaPeligrosa() %>°C, Aire: <%= dato.gethumedadAire() %>%, Gases: <%= dato.getGases() %>
-            </p>c
+              Temp: <%= dato.getTemperaturaGeneral() %>°C, Aire: <%= dato.gethumedadAire() %>%, viento: <%= dato.getViento() %> km/h
+            </p>
     <%
           }
         }
