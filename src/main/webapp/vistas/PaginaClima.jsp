@@ -33,6 +33,8 @@
 			    <li><a href="${pageContext.request.contextPath}/vistas/inicio.jsp">Inicio</a></li>
 			    <li><a href="${pageContext.request.contextPath}/vistas/PaginaClima.jsp">Mapa</a></li>
 			    <li><a href="${pageContext.request.contextPath}/vistas/about.jsp">About</a></li>
+			    <li><a href="${pageContext.request.contextPath}/vistas/Bitacora.jsp">bitacora</a></li>
+
 			  </ul>
 			</nav>
 			<h1 class="title">Mapa visual térmico dinámico</h1>
@@ -105,33 +107,30 @@
 
 // Paso 1: Pasar los datos Java al entorno JavaScript
 const datosClimaticos = [
-  <%if (datos != null && !datos.isEmpty()) {
-	for (int i = 0; i < datos.size(); i++) {
-		DatoClimatico d = datos.get(i);
-		String fechaStr = (d.getFecha() != null) ? d.getFecha().toString() : "Sin fecha";
-		double tempGen = d.getTemperaturaGeneral();
-		double tempPelig = d.getTemperaturaPeligrosa();
-		double humedad = d.getHumedadTierra();
-		double aireStr = d.gethumedadAire();
-		double gasesStr = d.getGases();
-		double vientoStr = d.getViento();%>
+  <% if (datos != null && !datos.isEmpty()) {
+       for (int i = 0; i < datos.size(); i++) {
+         DatoClimatico d = datos.get(i);
+         String fechaStr = (d.getFecha() != null) ? d.getFecha().toString() : "Sin fecha";
+         double tempGen = d.getTemperaturaGeneral();
+         double tempPelig = d.getTemperaturaPeligrosa();
+         double humedad = d.getHumedadTierra();
+         double aireStr = d.gethumedadAire();
+         double gasesStr = d.getGases();
+         double vientoStr = d.getViento();
+  %>
   {
-    fecha: "<%=fechaStr%>",
-    temperaturaGeneral: <%=tempGen%>,
-    temperaturaPeligrosa: <%=tempPelig%>,
-    humedadTierra: <%=humedad%>,
-    aire: <%=aireStr%>,
-    gases: <%=gasesStr%>,
-<<<<<<< HEAD
-    viento: <%=vientoStr%>
-=======
-    viento: <%=vientoStr %>
->>>>>>> 1dfbab4 (actualizando front & back)
-  }<%=(i < datos.size() - 1) ? "," : ""%>
-  <%}
-}%>
+    fecha: "<%= fechaStr %>",
+    temperaturaGeneral: <%= tempGen %>,
+    temperaturaPeligrosa: <%= tempPelig %>,
+    humedadTierra: <%= humedad %>,
+    aire: <%= aireStr %>,
+    gases: <%= gasesStr %>,
+    viento: <%= vientoStr %>
+  }<%= (i < datos.size() - 1) ? "," : "" %>
+  <%   }
+     }
+  %>
 ];
-
 console.log("Datos Climáticos recibidos:", datosClimaticos);
 // Paso 2: Coordenadas para sensores en Córdoba
 const coordenadasCordoba = [
@@ -150,17 +149,20 @@ function getColor(valor) {
   if (num < 40) return "#ff8000";  // naranja
   return "#ff0000";  // rojo si es >= 40
 }
-// Paso 4: Crear círculos con popups que muestran todos los valores
-const circulos = {};
-// Usamos los últimos 3 datos para los 3 sensores
-const datosMostrar = datosClimaticos.slice(-3);
+//Paso 4: Tomar solo los últimos 3 registros
+let ultimosDatos = datosClimaticos.slice(-coordenadasCordoba.length);
 
-datosMostrar.forEach((dato, i) => {
-  const coord = coordenadasCordoba[i];
+// Paso 5: Barajar los últimos datos para asignarlos al azar
+for (let i = ultimosDatos.length - 1; i > 0; i--) {
+  const j = Math.floor(Math.random() * (i + 1));
+  [ultimosDatos[i], ultimosDatos[j]] = [ultimosDatos[j], ultimosDatos[i]];
+}
+
+// Paso 6: Crear círculos con los datos barajados
+coordenadasCordoba.forEach((coord, index) => {
+  const dato = ultimosDatos[index]; // asigna un dato al azar a cada sensor
   const color = getColor(dato.temperaturaGeneral);
 
-  
-<<<<<<< HEAD
   const popupContent =
 	  "<strong>" + coord.nombre + "</strong><br>" +
 	  "Fecha: " + dato.fecha + "<br>" +
@@ -170,32 +172,14 @@ datosMostrar.forEach((dato, i) => {
 	  "Aire: " + dato.aire + "<br>" +
 	  "Gases: " + dato.gases + "<br>" +
 	  "Viento: " + dato.viento + " km/h";
-	
-=======
-	const popupContent =
-		  "<strong>" + coord.nombre + "</strong><br>" +
-		  "Fecha: " + dato.fecha + "<br>" +
-		  "Temp. General: " + dato.temperaturaGeneral + "°C<br>" +
-		  "Temp. Peligrosa: " + dato.temperaturaPeligrosa + "°C<br>" +
-		  "Humedad Tierra: " + dato.humedadTierra + "%<br>" +
-		  "Aire: " + dato.aire + "<br>" +
-		  "Gases: " + dato.gases + "<br>" +		
-		  "viento: " + dato.viento
-	;
->>>>>>> 1dfbab4 (actualizando front & back)
 
-  const circulo = L.circle([coord.lat, coord.lng], {
-	 
+  L.circle([coord.lat, coord.lng], {
     color: color,
     fillColor: color,
     fillOpacity: 0.6,
     radius: 9000
   }).addTo(map).bindPopup(popupContent);
-
-  circulos[i] = circulo;
-
 });
-
 </script>
 
 				</div>
@@ -204,61 +188,52 @@ datosMostrar.forEach((dato, i) => {
 					<button id="zoom-out">-</button>
 				</div>
 			</div>
+<script>
+//Nombres de sensores
+const nombresSensores = ["Sensor Norte", "Sensor Centro", "Sensor Este"];
 
+// Obtener los últimos 3 registros desde JSP
+const registros = [
+  <% 
+    if (datos != null && !datos.isEmpty()) {
+        List<DatoClimatico> ultimos = datos.size() > 3 ? datos.subList(datos.size() - 3, datos.size()) : datos;
+        for (int i = 0; i < ultimos.size(); i++) {
+            DatoClimatico d = ultimos.get(i);
+  %>
+  {
+    fecha: "<%= d.getFecha() %>",
+    tempGeneral: <%= d.getTemperaturaGeneral() %>,
+    tempPeligrosa: <%= d.getTemperaturaPeligrosa() %>,
+    humedadTierra: <%= d.getHumedadTierra() %>,
+    aire: <%= d.gethumedadAire() %>,
+    gases: <%= d.getGases() %>,
+    viento: <%= d.getViento() %>
+  }<%= (i < ultimos.size() - 1) ? "," : "" %>
+  <% 
+        }
+    } 
+  %>
+];
+const registrosConSensor = registros.map((dato, i) => ({
+	  ...dato,
+	  sensor: i === 0 ? "Sensor Centro" : i === 1 ? "Sensor Norte" : nombresSensores[i]
+	}));
+</script>
 			<!-- Right - Data + Alerta -->
 			<div class="right-panels">
 				<!-- Panel de datos -->
 				<div class="panel data-panel">
-					<h2>Datos diarios sensados y levantados de la BD</h2>
-					<%
-					if (ultimoDato == null) {
-					%>
-					<p>No hay datos para mostrar.</p>
-					<%
-					} else {
-					%>
-					<table class="data-table">
-						<tr>
-							<th>Fecha</th>
-							<td><%=ultimoDato.getFecha()%></td>
-						</tr>
-						<tr>
-							<th>Temperatura General</th>
-							<td><%=ultimoDato.getTemperaturaGeneral()%>°C</td>
-						</tr>
-						<tr>
-							<th>Temperatura Peligrosa</th>
-							<td><%=ultimoDato.getTemperaturaPeligrosa()%>°C</td>
-						</tr>
-						<tr>
-							<th>Humedad Tierra</th>
-							<td><%=ultimoDato.getHumedadTierra()%>%</td>
-						</tr>
-						<tr>
-							<th>Aire</th>
-							<td><%=ultimoDato.gethumedadAire()%></td>
-						</tr>
-						<tr>
-							<th>Gases</th>
-							<td><%=ultimoDato.getGases()%></td>
-						</tr>
-						<tr>
-<<<<<<< HEAD
-							<th>viento</th>
-							<td><%=ultimoDato.getViento()%></td>
-						</tr>
-						
-=======
-							<th>Viento</th>
-							<td><%=ultimoDato.getViento()%></td>
-						</tr>	
-
->>>>>>> 1dfbab4 (actualizando front & back)
-					</table>
-					<%
-					}
-					%>
-				</div>
+  <h2>Últimos registros</h2>
+  <table class="data-table" id="tablaRegistros">
+    <tbody>
+      <!-- Se llenará dinámicamente con JS -->
+    </tbody>
+  </table>
+  <div class="carousel-controls">
+    <button id="prev">⟨ Anterior</button>
+    <button id="next">Siguiente ⟩</button>
+  </div>
+</div>
 
 <%
     String alertClass = "";
@@ -285,44 +260,6 @@ datosMostrar.forEach((dato, i) => {
 %>
 
 <div class="panel alert-panel" id="alert-panel">
-<<<<<<< HEAD
-  <h2>Mensajes de alerta</h2>
-  <div class="alert-message" id="alert-message">
-    <%
-      if (datos != null && !datos.isEmpty()) {
-        boolean hayRiesgoIncendio = false;
-        String[] nombresSensores = { "Sensor Norte", "Sensor Centro", "Sensor Este", "Sensor Sur", "Sensor Extra" };
-
-        for (int i = 0; i < datos.size(); i++) {
-          DatoClimatico dato = datos.get(i);
-          boolean condicion = (dato.getTemperaturaGeneral() > 30 &&
-                              dato.gethumedadAire() > 30 &&
-                              dato.getViento() > 30);
-
-          if (condicion) {
-            hayRiesgoIncendio = true;
-            String nombreSensor = (i < nombresSensores.length) ? nombresSensores[i] : "Sensor " + (i + 1);
-    %>
-            <p>🔥 Riesgo de incendio en <strong><%= nombreSensor %></strong>:<br>
-              Temp: <%= dato.getTemperaturaGeneral() %>°C, Aire: <%= dato.gethumedadAire() %>%, viento: <%= dato.getViento() %> km/h
-            </p>
-    <%
-          }
-        }
-
-        if (!hayRiesgoIncendio) {
-    %>
-          <p>No hay alertas de incendio en este momento.</p>
-    <%
-        }
-      } else {
-    %>
-        <p>Sin información disponible.</p>
-    <%
-      }
-    %>
-  </div>
-=======
     <h2>Mensajes de alerta</h2>
     <div class="alert-message <%= alertClass %>" id="alert-message">
         <%
@@ -360,7 +297,6 @@ datosMostrar.forEach((dato, i) => {
             }
         %>
     </div>
->>>>>>> 1dfbab4 (actualizando front & back)
 </div>
 
 	</div>
@@ -371,5 +307,6 @@ datosMostrar.forEach((dato, i) => {
 	<script src="scripts/data.js"></script>
 	<script src="scripts/map.js"></script>
 	<script src="scripts/main.js"></script>
+	<script src="scripts/mostrarRegistro.js"></script>
 </body>
 </html>

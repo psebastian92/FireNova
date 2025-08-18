@@ -22,11 +22,8 @@ public class DatoClimatico {
         this.humedadTierra = humedadTierra;
         this.humedadAire = humedadAire;
         this.gases = gases;
-<<<<<<< HEAD
         this.viento= viento;
-=======
         this.viento = viento;
->>>>>>> 1dfbab4 (actualizando front & back)
         this.latitud= latitud;
         this.longitud= longitud;
 

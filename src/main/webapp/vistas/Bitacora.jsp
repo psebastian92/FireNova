@@ -5,7 +5,7 @@
 <head>
 <meta charset="UTF-8">
    <title>Prevención de Incendios Forestales</title>
-        <link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/styles/bitacora/bitacora.css">
         <script src="https://cdn.jsdelivr.net/npm/typed.js@2.1.0/dist/typed.umd.js"></script>
 </head>
 <body>
@@ -24,6 +24,15 @@
                 <a href="#sobre-nosotros">Sobre Nosotros</a>
                 <a href="#bitacora">Bitácora</a>
                 <a href="#proceso">Proceso</a>
+            </div>
+            <div class="nav-refeo" id="nav-refeo">
+            	<div class="nav">
+            	  <a href="#inicio">Inicio</a>
+                <a href="vistas/paginaClima.jsp">Mapa</a>
+                <a href="vistas/about.jsp">about</a>
+                <a href="vistas/Bitacora.jsp">Bitácora</a>
+            	</div>
+            
             </div>
         </div>
     </div>
@@ -668,7 +677,7 @@ Ailen Mier y Brenda Cardozo: Ambas van a estar encargadas de construir el dispos
     </section>
     
     <script src="https://cdn.jsdelivr.net/npm/typed.js@2.1.0/dist/typed.umd.js"></script>
-    <script src="script.js"></script>
+    <script src="scripts/bitacora/bitacora.js"></script>
   
 </body>
 </html>

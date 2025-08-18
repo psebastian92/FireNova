@@ -16,14 +16,10 @@ public class LeerDatos extends HttpServlet {
 
     	List<DatoClimatico> datos = new ArrayList<>();
     	String sql = "SELECT id, fecha, temperatura_general, temperatura_peligrosa, " +
-<<<<<<< HEAD
-    	             "humedad_tierra, gases, humedad_aire, Viento " +
-=======
-    	             "humedad_tierra, gases, humedad_aire , viento " +
->>>>>>> 1dfbab4 (actualizando front & back)
+    	             "humedad_tierra, gases, humedad_aire, viento " +
     	             "FROM datos " +
     	             "ORDER BY fecha DESC " +
-    	             "LIMIT 10";
+    	             "LIMIT 3";
 
     	try (Connection conexion = ConexionBD.obtenerConexion();
     	     Statement statement = conexion.createStatement();
@@ -38,13 +34,11 @@ public class LeerDatos extends HttpServlet {
 
     	        Timestamp timestamp = rs.getTimestamp("fecha");
     	        Date fecha = new Date(timestamp.getTime());
-
     	        double temperaturaGeneral = rs.getDouble("temperatura_general");
     	        double TemperaturaPeligrosa = rs.getDouble("temperatura_peligrosa");
     	        double humedadTierra = rs.getDouble("humedad_tierra");
     	        double gases = rs.getDouble("gases");
     	        double humedadAire = rs.getDouble("humedad_aire");
-<<<<<<< HEAD
     	        double viento = rs.getDouble("Viento");
 
     	        System.out.println("Fecha: " + fecha + ", Temp general: " + temperaturaGeneral +
@@ -53,20 +47,8 @@ public class LeerDatos extends HttpServlet {
 
     	        DatoClimatico dato = new DatoClimatico(
     	            fecha, temperaturaGeneral, TemperaturaPeligrosa,
-    	            humedadTierra, humedadAire, gases, viento
-=======
-    	        double Viento = rs.getDouble("viento");
-
-
-    	        System.out.println("Fecha: " + fecha + ", Temp general: " + temperaturaGeneral +
-    	                ", Peligrosa: " + temperaturaPeligrosa + ", Tierra: " + humedadTierra +
-    	                ", Humedad Aire: " + humedadAire + ", Gases: " + gases + ", viento: " + Viento);
-
-    	        DatoClimatico dato = new DatoClimatico(
-    	            fecha, temperaturaGeneral, temperaturaPeligrosa,
-    	            humedadTierra, humedadAire, gases, Viento
->>>>>>> 1dfbab4 (actualizando front & back)
-    	        );
+    	            humedadTierra, humedadAire, gases, viento);
+    	
 
     	        datos.add(dato);
     	    }
