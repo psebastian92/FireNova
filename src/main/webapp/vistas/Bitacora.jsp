@@ -9,7 +9,7 @@
         <script src="https://cdn.jsdelivr.net/npm/typed.js@2.1.0/dist/typed.umd.js"></script>
 </head>
 <body>
-<nav>
+    <nav>
         <div class="container">
             <button class="menu-button" onclick="toggleMenu()">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="menu-icon"><line x1="4" y1="12" x2="20" y2="12"></line><line x1="4" y1="6" x2="20" y2="6"></line><line x1="4" y1="18" x2="20" y2="18"></line></svg>
@@ -20,19 +20,9 @@
     <div class="modal-menu" id="modalMenu">
         <div class="modal-content">
             <div class="nav-links">
-                <a href="#inicio">Inicio</a>
-                <a href="#sobre-nosotros">Sobre Nosotros</a>
-                <a href="#bitacora">Bitácora</a>
-                <a href="#proceso">Proceso</a>
-            </div>
-            <div class="nav-refeo" id="nav-refeo">
-            	<div class="nav">
-            	  <a href="#inicio">Inicio</a>
-                <a href="vistas/paginaClima.jsp">Mapa</a>
-                <a href="vistas/about.jsp">about</a>
-                <a href="vistas/Bitacora.jsp">Bitácora</a>
-            	</div>
-            
+               <a href="${pageContext.request.contextPath}/vistas/inicio.jsp">Inicio</a>
+                    <a href="${pageContext.request.contextPath}/LeerDatos">Mapa</a>
+                    <a href="${pageContext.request.contextPath}/vistas/Bitacora.jsp">Bitácora</a>
             </div>
         </div>
     </div>
@@ -60,7 +50,7 @@
                 <div class="vertical-line"></div>
                 
                 <div class="about-image fade-right hidden">
-                    <img src="logo.png" alt="School">
+                    <img src="${pageContext.request.contextPath}/multimedia/logo.png" alt="School">
                 </div>
             </div>
         </div>
@@ -677,7 +667,7 @@ Ailen Mier y Brenda Cardozo: Ambas van a estar encargadas de construir el dispos
     </section>
     
     <script src="https://cdn.jsdelivr.net/npm/typed.js@2.1.0/dist/typed.umd.js"></script>
-    <script src="scripts/bitacora/bitacora.js"></script>
+    <script src="${pageContext.request.contextPath}/scripts/bitacora/bitacora.js"></script>
   
 </body>
 </html>

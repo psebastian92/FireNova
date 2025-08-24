@@ -62,7 +62,7 @@ window.addEventListener('scroll', () => {
 // ============================================
 
 // Configuration for auto-scroll
-/*
+
 const AUTO_SCROLL_CONFIG = {
     enabled: true, // Set to false to disable auto-scroll
     scrollSpeed: 1, // Pixels per frame (lower = slower)
@@ -100,7 +100,7 @@ function startAutoScroll() {
 
     autoScrollInterval = setInterval(scroll, 20);
 }
-*/
+
 // Start auto-scroll when the page loads
 window.addEventListener('load', startAutoScroll);
 

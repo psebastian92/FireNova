@@ -203,7 +203,7 @@ nav {
 .about-background {
     position: absolute;
     inset: 0;
-    background-image: url('foto.png');
+    background-image: url('../../multimedia/foto.png');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
