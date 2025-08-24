@@ -24,15 +24,17 @@ public class CrearDatos extends HttpServlet {
             double humedad_tierra = (double) request.getAttribute("humedad_tierra");
             double aire = (double) request.getAttribute("aire");
             double gases = (double) request.getAttribute("gases");
-
+            double velocidad = (double) request.getAttribute("velocidad");
+            
             // Conexión a la base de datos
             try (Connection conexion = ConexionBD.obtenerConexion()) {
-                String sql = "INSERT INTO datos (temperatura_general, humedad_tierra, humedad_aire, gases, fecha) VALUES (?, ?, ?, ?, NOW())";
+                String sql = "INSERT INTO datos (temperatura_general, humedad_tierra, humedad_aire, gases,viento, fecha) VALUES (?, ?, ?, ?,?, NOW())";
                 try (PreparedStatement statement = conexion.prepareStatement(sql)) {
                     statement.setDouble(1, temperatura);
                     statement.setDouble(2, humedad_tierra);
                     statement.setDouble(3, aire);
                     statement.setDouble(4, gases);
+                    statement.setDouble(5, velocidad);
                     
                     int filasAfectadas = statement.executeUpdate();
                     if (filasAfectadas > 0) {

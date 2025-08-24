@@ -265,7 +265,7 @@ function actualizarAlertas() {
     }
 
     // --- Condición de humo detectado ---
-    if (s.datos.gases >= 31) { // Medio o Alto
+    if (s.datos.gases >= 61) { // Alto
       hayAlertas = true;
       alertContainer.innerHTML +=
         "<p>" +

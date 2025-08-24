@@ -39,7 +39,7 @@ public class LeerDatos extends HttpServlet {
     	        double humedadTierra = rs.getDouble("humedad_tierra");
     	        double gases = rs.getDouble("gases");
     	        double humedadAire = rs.getDouble("humedad_aire");
-    	        double viento = rs.getDouble("Viento");
+    	        double viento = rs.getDouble("viento");
 
     	        System.out.println("Fecha: " + fecha + ", Temp general: " + temperaturaGeneral +
     	                ", Peligrosa: " + TemperaturaPeligrosa + ", Tierra: " + humedadTierra +
