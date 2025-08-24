@@ -7,7 +7,6 @@ function mostrarRegistro(indice) {
     <tr><th>Sensor</th><td>${r.sensor}</td></tr>
     <tr><th>Fecha</th><td>${r.fecha}</td></tr>
     <tr><th>Temperatura General</th><td>${r.tempGeneral}°C</td></tr>
-    <tr><th>Temperatura Peligrosa</th><td>${r.tempPeligrosa}°C</td></tr>
     <tr><th>Humedad Tierra</th><td>${r.humedadTierra}%</td></tr>
     <tr><th>Aire</th><td>${r.aire}</td></tr>
     <tr><th>Gases</th><td>${r.gases}</td></tr>
