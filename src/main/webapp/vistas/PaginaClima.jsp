@@ -13,10 +13,10 @@
 <link rel="stylesheet" href="${pageContext.request.contextPath}/styles/main1.css">
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<link rel="apple-touch-icon" sizes="512x512" href="${pageContext.request.contextPath}/multimedia/apple-touch-icon.png">
 
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-
 </head>
 <body>
 	<div class="container">
@@ -30,9 +30,8 @@
 			<!-- Menú de navegación -->
 			<nav class="main-nav">
 			  <ul>
-			    <li><a href="${pageContext.request.contextPath}/vistas/inicio.jsp">Inicio</a></li>
-			    <li><a href="${pageContext.request.contextPath}/vistas/PaginaClima.jsp">Mapa</a></li>
-			    <li><a href="${pageContext.request.contextPath}/vistas/about.jsp">About</a></li>
+                <li><a href="${pageContext.request.contextPath}/vistas/inicio.jsp">Inicio</a></li>
+			    <li><a href="${pageContext.request.contextPath}/LeerDatos">Mapa</a></li>
 			    <li><a href="${pageContext.request.contextPath}/vistas/Bitacora.jsp">bitacora</a></li>
 
 			  </ul>
@@ -119,17 +118,20 @@ const datosClimaticos = [
          double vientoStr = d.getViento();
   %>
   {
-    fecha: "<%= fechaStr %>",
-    temperaturaGeneral: <%= tempGen %>,
-    temperaturaPeligrosa: <%= tempPelig %>,
-    humedadTierra: <%= humedad %>,
-    aire: <%= aireStr %>,
-    gases: <%= gasesStr %>,
-    viento: <%= vientoStr %>
-  }<%= (i < datos.size() - 1) ? "," : "" %>
-  <%   }
-     }
-  %>
+
+    fecha: "<%=fechaStr%>",
+    temperaturaGeneral: <%=tempGen%>,
+    temperaturaPeligrosa: <%=tempPelig%>,
+    humedadTierra: <%=humedad%>,
+    aire: <%=aireStr%>,
+    gases: <%=gasesStr%>,
+    viento: <%=vientoStr%>,
+  }<%=(i < datos.size() - 1) ? "," : ""%>
+  <%}
+}%>
+
+
+
 ];
 console.log("Datos Climáticos recibidos:", datosClimaticos);
 // Paso 2: Coordenadas para sensores en Córdoba
@@ -150,7 +152,7 @@ function getColor(valor) {
   return "#ff0000";  // rojo si es >= 40
 }
 //Paso 4: Tomar solo los últimos 3 registros
-let ultimosDatos = datosClimaticos.slice(-coordenadasCordoba.length);
+let ultimosDatos = datosClimaticos.slice(-Math.min(coordenadasCordoba.length, datosClimaticos.length));
 
 // Paso 5: Barajar los últimos datos para asignarlos al azar
 for (let i = ultimosDatos.length - 1; i > 0; i--) {
@@ -161,25 +163,35 @@ for (let i = ultimosDatos.length - 1; i > 0; i--) {
 // Paso 6: Crear círculos con los datos barajados
 coordenadasCordoba.forEach((coord, index) => {
   const dato = ultimosDatos[index]; // asigna un dato al azar a cada sensor
+  if (!dato) return; // evita errores si no hay suficiente dato
   const color = getColor(dato.temperaturaGeneral);
 
   const popupContent =
-	  "<strong>" + coord.nombre + "</strong><br>" +
-	  "Fecha: " + dato.fecha + "<br>" +
-	  "Temp. General: " + dato.temperaturaGeneral + "°C<br>" +
-	  "Temp. Peligrosa: " + dato.temperaturaPeligrosa + "°C<br>" +
-	  "Humedad Tierra: " + dato.humedadTierra + "%<br>" +
-	  "Aire: " + dato.aire + "<br>" +
-	  "Gases: " + dato.gases + "<br>" +
-	  "Viento: " + dato.viento + " km/h";
+      "<strong>" + coord.nombre + "</strong><br>" +
+      "Fecha: " + dato.fecha + "<br>" +
+      "Temp. General: " + dato.temperaturaGeneral + "°C<br>" +
+      "Humedad Tierra: " + dato.humedadTierra + "%<br>" +
+      "Aire: " + dato.aire + "<br>" +
+      "Gases: " + dato.gases + "<br>" +
+      "Viento: " + dato.viento + " km/h";
 
   L.circle([coord.lat, coord.lng], {
-    color: color,
-    fillColor: color,
-    fillOpacity: 0.6,
-    radius: 9000
+      color: color,
+      fillColor: color,
+      fillOpacity: 0.6,
+      radius: 9000
   }).addTo(map).bindPopup(popupContent);
 });
+
+let registrosConSensor = ultimosDatos.map((dato, index) => ({
+	  sensor: coordenadasCordoba[index].nombre,  // nombre del sensor desde coordenadas
+	  fecha: dato.fecha,
+	  tempGeneral: dato.temperaturaGeneral,
+	  humedadTierra: dato.humedadTierra,
+	  aire: dato.aire,
+	  gases: dato.gases,
+	  viento: dato.viento
+	}));
 </script>
 
 				</div>
@@ -188,116 +200,73 @@ coordenadasCordoba.forEach((coord, index) => {
 					<button id="zoom-out">-</button>
 				</div>
 			</div>
-<script>
-//Nombres de sensores
-const nombresSensores = ["Sensor Norte", "Sensor Centro", "Sensor Este"];
 
-// Obtener los últimos 3 registros desde JSP
-const registros = [
-  <% 
-    if (datos != null && !datos.isEmpty()) {
-        List<DatoClimatico> ultimos = datos.size() > 3 ? datos.subList(datos.size() - 3, datos.size()) : datos;
-        for (int i = 0; i < ultimos.size(); i++) {
-            DatoClimatico d = ultimos.get(i);
-  %>
-  {
-    fecha: "<%= d.getFecha() %>",
-    tempGeneral: <%= d.getTemperaturaGeneral() %>,
-    tempPeligrosa: <%= d.getTemperaturaPeligrosa() %>,
-    humedadTierra: <%= d.getHumedadTierra() %>,
-    aire: <%= d.gethumedadAire() %>,
-    gases: <%= d.getGases() %>,
-    viento: <%= d.getViento() %>
-  }<%= (i < ultimos.size() - 1) ? "," : "" %>
-  <% 
-        }
-    } 
-  %>
-];
-const registrosConSensor = registros.map((dato, i) => ({
-	  ...dato,
-	  sensor: i === 0 ? "Sensor Centro" : i === 1 ? "Sensor Norte" : nombresSensores[i]
-	}));
-</script>
-			<!-- Right - Data + Alerta -->
-			<div class="right-panels">
-				<!-- Panel de datos -->
-				<div class="panel data-panel">
-  <h2>Últimos registros</h2>
-  <table class="data-table" id="tablaRegistros">
-    <tbody>
-      <!-- Se llenará dinámicamente con JS -->
-    </tbody>
-  </table>
-  <div class="carousel-controls">
-    <button id="prev">⟨ Anterior</button>
-    <button id="next">Siguiente ⟩</button>
+	<div class="right-panels">
+    <h2>Últimos registros</h2>
+    <table class="data-table" id="tablaRegistros">
+        <tbody>
+            <!-- Se llena con JS -->
+        </tbody>
+    </table>
+
+    <div class="carousel-controls">
+        <button id="prev">⟨ Anterior</button>
+        <button id="next">Siguiente ⟩</button>
+    </div>
+
+<!-- 👇 El panel de alerta va adentro de right-panels -->
+<div class="panel alert-panel" id="alert-panel">
+  <h2>Mensajes de alerta</h2>
+  <div class="alert-message" id="alert-message">
+    <p>Cargando datos...</p>
   </div>
 </div>
 
-<%
-    String alertClass = "";
-    if (datos != null && !datos.isEmpty()) {
-        boolean hayAlertas = false;
-        String[] nombresSensores = { "Sensor Norte", "Sensor Centro", "Sensor Este", "Sensor Sur", "Sensor Extra" };
+<script>
+//👇 este arreglo es el que usan las alertas
+let sensoresConDatos = coordenadasCordoba.map((coord, index) => ({
+  nombre: coord.nombre,
+  lat: coord.lat,
+  lng: coord.lng,
+  datos: ultimosDatos[index]
+})).filter(s => s.datos);
 
-        for (int i = 0; i < datos.size(); i++) {
-            DatoClimatico dato = datos.get(i);
-            if (dato.getTemperaturaGeneral() > 30 &&
-                dato.gethumedadAire() > 30 &&
-                dato.getViento() > 30) {
-                hayAlertas = true;
-                alertClass = "danger"; // Aquí marcamos clase danger
-            }
-        }
+// Función de alertas
+function actualizarAlertas() {
+  const alertContainer = document.getElementById("alert-message");
+  alertContainer.innerHTML = ""; 
 
-        if (!hayAlertas) {
-            alertClass = "warning"; // Podrías usar warning si no hay peligro
-        }
-    } else {
-        alertClass = "warning";
+  let hayAlertas = false;
+
+  sensoresConDatos.forEach(s => {
+    if (s.datos.temperaturaGeneral > 30 &&
+        s.datos.humedadTierra < 30 &&
+        s.datos.viento > 30) {
+
+      hayAlertas = true;
+      alertContainer.innerHTML +=
+        "<p>" +
+          "<strong>⚠️ Condiciones peligrosas en " + s.nombre + ":</strong><br>" +
+          "🌡 Temp: " + s.datos.temperaturaGeneral + "°C<br>" +
+          "💧 Humedad: " + s.datos.humedadTierra + "%<br>" +
+          "💨 Viento: " + s.datos.viento + " km/h" +
+        "</p>";
     }
-%>
+  });
 
-<div class="panel alert-panel" id="alert-panel">
-    <h2>Mensajes de alerta</h2>
-    <div class="alert-message <%= alertClass %>" id="alert-message">
-        <%
-            if (datos != null && !datos.isEmpty()) {
-                boolean hayAlertas = false;
-                String[] nombresSensores = { "Sensor Norte", "Sensor Centro", "Sensor Este", "Sensor Sur", "Sensor Extra" };
+  if (!hayAlertas) {
+    alertContainer.innerHTML = "<p>No hay riesgo previsto</p>";
+  }
 
-                for (int i = 0; i < datos.size(); i++) {
-                    DatoClimatico dato = datos.get(i);
-                    if (dato.getTemperaturaGeneral() > 30 &&
-                        dato.gethumedadAire() > 30 &&
-                        dato.getViento() > 30) {
-                        hayAlertas = true;
-                        String nombreSensor = (i < nombresSensores.length) ? nombresSensores[i] : "Sensor " + (i + 1);
-        %>
-         <p>
-   			 <strong>Condiciones peligrosas en <%= nombreSensor %>:</strong><br>
-  				  🌡 Temperatura: <%= dato.getTemperaturaGeneral() %>°C<br>
-   					 💧 Humedad: <%= dato.gethumedadAire() %>%<br>
-    					💨 Viento: <%= dato.getViento() %> km/h
-		</p>
-        <%
-                    }
-                }
+  alertContainer.className = "alert-message " + (hayAlertas ? "danger" : "warning");
+}
 
-                if (!hayAlertas) {
-        %>
-                    <p>No hay riesgo previsto</p>
-        <%
-                }
-            } else {
-        %>
-                <p>Sin información disponible.</p>
-        <%
-            }
-        %>
-    </div>
-</div>
+// ejecutar después de definir sensoresConDatos
+actualizarAlertas();
+</script>
+
+
+</div> <!-- ahora sí cierra right-panels -->
 
 	</div>
 		</main>
