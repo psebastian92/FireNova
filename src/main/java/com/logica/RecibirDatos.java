@@ -50,6 +50,19 @@ public class RecibirDatos extends HttpServlet {
             aire_valor = Double.parseDouble(humedadAire);
             gases_valor = Double.parseDouble(gas);
 
+         // --- Normalización a un índice de humo 0–100 ---
+            double baseline = 200.0; // valor típico en aire limpio (ajústalo a tus datos)
+            double rango = 300.0;    // sensibilidad: cuánto por encima del baseline se considera 100
+
+            // calcular delta sobre el baseline
+            double delta = gases_valor - baseline;
+            if (delta < 0) delta = 0;
+
+            // convertir a escala 0–100
+            gases_valor = (delta * 100.0) / rango;
+            if (gases_valor > 100) gases_valor = 100;
+            
+            
             // Enviar respuesta a Arduino
             response.setContentType("text/plain");
             response.getWriter().write("Datos recibidos correctamente");

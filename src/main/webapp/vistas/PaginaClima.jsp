@@ -14,7 +14,9 @@
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 <link rel="apple-touch-icon" sizes="512x512" href="${pageContext.request.contextPath}/multimedia/apple-touch-icon.png">
-
+<link rel="icon"
+	href="${pageContext.request.contextPath}/multimedia/favicon.ico"
+	type="image/x-icon">
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 </head>
@@ -25,14 +27,14 @@
 				<div class="logo">
 					<img src="${pageContext.request.contextPath}/multimedia/logo.png" alt="Logo">
 				</div>
-				<span class="website">www.fatima.com</span>
+				<span class="website">Instituto Técnico Nuestra Señora de Fátima</span>
 			</div>
 			<!-- Menú de navegación -->
 			<nav class="main-nav">
 			  <ul>
                 <li><a href="${pageContext.request.contextPath}/vistas/inicio.jsp">Inicio</a></li>
 			    <li><a href="${pageContext.request.contextPath}/LeerDatos">Mapa</a></li>
-			    <li><a href="${pageContext.request.contextPath}/vistas/Bitacora.jsp">bitacora</a></li>
+			    <li><a href="${pageContext.request.contextPath}/vistas/Bitacora.jsp">Bitacora</a></li>
 
 			  </ul>
 			</nav>
@@ -171,7 +173,7 @@ coordenadasCordoba.forEach((coord, index) => {
       "Fecha: " + dato.fecha + "<br>" +
       "Temp. General: " + dato.temperaturaGeneral + "°C<br>" +
       "Humedad Tierra: " + dato.humedadTierra + "%<br>" +
-      "Aire: " + dato.aire + "<br>" +
+      "Aire: " + dato.aire + "%<br>" +
       "Gases: " + dato.gases + "<br>" +
       "Viento: " + dato.viento + " km/h";
 
@@ -231,13 +233,22 @@ let sensoresConDatos = coordenadasCordoba.map((coord, index) => ({
   datos: ultimosDatos[index]
 })).filter(s => s.datos);
 
+// Función para generar alertas de incendio inmediato por presencia de gases combustibles
+function nivelHumo(valor) {
+	  const v = Number(valor);
+	  if (v >= 61) return "Alto";
+	  if (v >= 31) return "Medio";
+	  return "Bajo";
+	}
+
 // Función de alertas
 function actualizarAlertas() {
   const alertContainer = document.getElementById("alert-message");
   alertContainer.innerHTML = ""; 
 
   let hayAlertas = false;
-
+  
+  // Analizar la tríada de los 30
   sensoresConDatos.forEach(s => {
     if (s.datos.temperaturaGeneral > 30 &&
         s.datos.humedadTierra < 30 &&
@@ -252,7 +263,19 @@ function actualizarAlertas() {
           "💨 Viento: " + s.datos.viento + " km/h" +
         "</p>";
     }
+
+    // --- Condición de humo detectado ---
+    if (s.datos.gases >= 31) { // Medio o Alto
+      hayAlertas = true;
+      alertContainer.innerHTML +=
+        "<p>" +
+          "<strong>🔥 Posible inicio de incendio en " + s.nombre + ":</strong><br>" +
+          "💨 Índice de humo: " + s.datos.gases + "% (" + nivelHumo(s.datos.gases) + ")" +
+        "</p>";
+    }
   });
+  
+  
 
   if (!hayAlertas) {
     alertContainer.innerHTML = "<p>No hay riesgo previsto</p>";
