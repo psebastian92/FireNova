@@ -9,7 +9,9 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/styles/styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="apple-touch-icon" sizes="512x512" href="${pageContext.request.contextPath}/multimedia/apple-touch-icon.png">
-    
+    <link rel="icon"
+	href="${pageContext.request.contextPath}/multimedia/favicon.ico"
+	type="image/x-icon">
 </head>
 <body>
     <!-- Hero Section -->

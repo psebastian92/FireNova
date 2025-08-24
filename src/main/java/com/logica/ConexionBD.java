@@ -6,7 +6,8 @@ import java.sql.SQLException;
 
 public class ConexionBD {
 
-	private static final String URL = "jdbc:mysql://viajando.fatimarem.edu.ar:3306/firenova?useUnicode=true&characterEncoding=UTF-8";
+	//private static final String URL = "jdbc:mysql://viajando.fatimarem.edu.ar:3306/firenova?useUnicode=true&characterEncoding=UTF-8";
+	private static final String URL = "jdbc:mysql://localhost:3306/firenova?useUnicode=true&characterEncoding=UTF-8";
 	private static final String USUARIO = "firenova";
 	private static final String CONTRASENA = "decilodecilo"; // Si la base de datos no tiene contraseña, deja esto vacío
 
