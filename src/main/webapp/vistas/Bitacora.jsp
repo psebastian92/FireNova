@@ -8,7 +8,9 @@
 <link rel="stylesheet" href="${pageContext.request.contextPath}/styles/bitacora/bitacora.css">
         <script src="https://cdn.jsdelivr.net/npm/typed.js@2.1.0/dist/typed.umd.js"></script>
         <link rel="apple-touch-icon" sizes="512x512" href="${pageContext.request.contextPath}/multimedia/apple-touch-icon.png">
-        
+          <link rel="icon"
+	href="${pageContext.request.contextPath}/multimedia/favicon.ico"
+	type="image/x-icon">
 </head>
 <body>
     <nav>
